@@ -32,24 +32,42 @@ func buildEmbedText(ch codetypes.CodeChunk, maxChars int) (string, bool) {
 		ch.Signature,
 	}), "\n\n"))
 
-	var full string
-	if ch.Code != "" {
-		if meta != "" {
-			full = meta + "\n\n" + ch.Code
+	var metaWithSep string
+	if meta != "" {
+		if ch.Code != "" {
+			metaWithSep = meta + "\n\n"
 		} else {
-			full = ch.Code
+			metaWithSep = meta
 		}
-	} else {
-		full = meta
+	} else if ch.Code == "" {
+		return "", false
 	}
 
-	runes := []rune(full)
-	if len(runes) <= maxChars {
-		return full, false
+	metaRunes := []rune(metaWithSep)
+	if len(metaRunes) >= maxChars {
+		return string(metaRunes[:maxChars]), true
 	}
 
-	// Truncate to maxChars. Since metadata is at the start, it is preserved.
-	return string(runes[:maxChars]), true
+	remaining := maxChars - len(metaRunes)
+
+	// Memory optimization for huge code chunks: avoid []rune conversion
+	// and full string concatenation unless needed.
+	if len(ch.Code) <= remaining {
+		// Fast path: byte length <= remaining runes guaranteed to fit
+		return metaWithSep + ch.Code, false
+	}
+
+	// Slower path: count runes by ranging over the string which gives byte indices
+	// at rune boundaries, avoiding copying the massive ch.Code into a []rune.
+	charCount := 0
+	for byteIndex := range ch.Code {
+		if charCount >= remaining {
+			return metaWithSep + ch.Code[:byteIndex], true
+		}
+		charCount++
+	}
+
+	return metaWithSep + ch.Code, false
 }
 
 // Indexer indexes CodeChunks into LongTermMemory using an embedding Provider.
