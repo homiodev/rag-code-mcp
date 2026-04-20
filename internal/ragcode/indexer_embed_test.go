@@ -110,3 +110,44 @@ func TestBuildEmbedText_EmptyCode(t *testing.T) {
 		t.Errorf("signature missing")
 	}
 }
+
+func TestBuildEmbedText_OversizedMetadata(t *testing.T) {
+	limit := 100
+	bigDocstring := strings.Repeat("D", 200)
+	ch := codetypes.CodeChunk{
+		Signature: "func Big()",
+		Code:      "return nil",
+		Docstring: bigDocstring,
+		FilePath:  "big.go",
+	}
+	text, truncated := buildEmbedText(ch, limit)
+	if !truncated {
+		t.Fatal("expected truncation when metadata alone exceeds limit")
+	}
+	runes := []rune(text)
+	if len(runes) > limit {
+		t.Errorf("text has %d runes, want <= %d", len(runes), limit)
+	}
+	if len(runes) != limit {
+		t.Errorf("text has %d runes, want exactly %d (hard-capped)", len(runes), limit)
+	}
+}
+
+func TestBuildEmbedText_OversizedMetadata_NoCode(t *testing.T) {
+	limit := 50
+	bigDocstring := strings.Repeat("Z", 80)
+	ch := codetypes.CodeChunk{
+		Signature: "func Huge()",
+		Code:      "",
+		Docstring: bigDocstring,
+		FilePath:  "huge.go",
+	}
+	text, truncated := buildEmbedText(ch, limit)
+	if !truncated {
+		t.Fatal("expected truncation when metadata exceeds limit")
+	}
+	runes := []rune(text)
+	if len(runes) > limit {
+		t.Errorf("text has %d runes, want <= %d", len(runes), limit)
+	}
+}

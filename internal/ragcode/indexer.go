@@ -22,8 +22,9 @@ const maxEmbedChars = 30_000
 
 // buildEmbedText constructs the text to embed for a CodeChunk, then truncates it
 // to maxChars (rune-safe, UTF-8 correct) to avoid exceeding the model's context
-// window. Metadata (docstring, signature) is always preserved in full; only Code
-// is truncated when the total exceeds maxChars.
+// window. Metadata (docstring, signature) is placed first so it is naturally
+// preserved during truncation. When the total exceeds maxChars the result is
+// hard-capped — no part of the text (including metadata) is allowed to overflow.
 // Returns (text, wasTruncated).
 func buildEmbedText(ch codetypes.CodeChunk, maxChars int) (string, bool) {
 	meta := strings.TrimSpace(strings.Join(filterNonEmpty([]string{
@@ -47,21 +48,8 @@ func buildEmbedText(ch codetypes.CodeChunk, maxChars int) (string, bool) {
 		return full, false
 	}
 
-	// Truncate only the Code portion — keep metadata intact.
-	metaWithSep := meta
-	if meta != "" && ch.Code != "" {
-		metaWithSep = meta + "\n\n"
-	}
-	metaRunes := []rune(metaWithSep)
-	remaining := maxChars - len(metaRunes)
-	if remaining < 0 {
-		remaining = 0
-	}
-	codeRunes := []rune(ch.Code)
-	if remaining > len(codeRunes) {
-		remaining = len(codeRunes)
-	}
-	return metaWithSep + string(codeRunes[:remaining]), true
+	// Truncate to maxChars. Since metadata is at the start, it is preserved.
+	return string(runes[:maxChars]), true
 }
 
 // Indexer indexes CodeChunks into LongTermMemory using an embedding Provider.
