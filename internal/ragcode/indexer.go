@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"hash/fnv"
+	"log"
 	"path/filepath"
 	"strings"
 
@@ -12,6 +13,62 @@ import (
 	"github.com/doITmagic/rag-code-mcp/internal/llm"
 	"github.com/doITmagic/rag-code-mcp/internal/memory"
 )
+
+// maxEmbedChars is the maximum number of Unicode characters sent to the embedding
+// model. Common models (e.g. nomic-embed-text) have an 8 192-token context window
+// (~4 chars/token → ~32 768 chars). We use 30 000 to give ~6% headroom and stay
+// compatible with smaller-window models.
+const maxEmbedChars = 30_000
+
+// buildEmbedText constructs the text to embed for a CodeChunk, then truncates it
+// to maxChars (rune-safe, UTF-8 correct) to avoid exceeding the model's context
+// window. Metadata (docstring, signature) is placed first so it is naturally
+// preserved during truncation. When the total exceeds maxChars the result is
+// hard-capped — no part of the text (including metadata) is allowed to overflow.
+// Returns (text, wasTruncated).
+func buildEmbedText(ch codetypes.CodeChunk, maxChars int) (string, bool) {
+	meta := strings.TrimSpace(strings.Join(filterNonEmpty([]string{
+		ch.Docstring,
+		ch.Signature,
+	}), "\n\n"))
+
+	var metaWithSep string
+	if meta != "" {
+		if ch.Code != "" {
+			metaWithSep = meta + "\n\n"
+		} else {
+			metaWithSep = meta
+		}
+	} else if ch.Code == "" {
+		return "", false
+	}
+
+	metaRunes := []rune(metaWithSep)
+	if len(metaRunes) >= maxChars {
+		return string(metaRunes[:maxChars]), true
+	}
+
+	remaining := maxChars - len(metaRunes)
+
+	// Memory optimization for huge code chunks: avoid []rune conversion
+	// and full string concatenation unless needed.
+	if len(ch.Code) <= remaining {
+		// Fast path: byte length <= remaining runes guaranteed to fit
+		return metaWithSep + ch.Code, false
+	}
+
+	// Slower path: count runes by ranging over the string which gives byte indices
+	// at rune boundaries, avoiding copying the massive ch.Code into a []rune.
+	charCount := 0
+	for byteIndex := range ch.Code {
+		if charCount >= remaining {
+			return metaWithSep + ch.Code[:byteIndex], true
+		}
+		charCount++
+	}
+
+	return metaWithSep + ch.Code, false
+}
 
 // Indexer indexes CodeChunks into LongTermMemory using an embedding Provider.
 type Indexer struct {
@@ -34,13 +91,14 @@ func (i *Indexer) IndexPaths(ctx context.Context, paths []string, sourceTag stri
 
 	indexed := 0
 	for _, ch := range chunks {
-		text := strings.TrimSpace(strings.Join(filterNonEmpty([]string{
-			ch.Docstring,
-			ch.Signature,
-			ch.Code,
-		}), "\n\n"))
+		text, wasTruncated := buildEmbedText(ch, maxEmbedChars)
+		text = strings.TrimSpace(text)
 		if text == "" {
 			continue
+		}
+		if wasTruncated {
+			log.Printf("[WARN] embed text truncated for %s (%s:%d-%d) — content exceeds model context window",
+				ch.Name, filepath.Base(ch.FilePath), ch.StartLine, ch.EndLine)
 		}
 
 		emb, err := i.embedder.Embed(ctx, text)
