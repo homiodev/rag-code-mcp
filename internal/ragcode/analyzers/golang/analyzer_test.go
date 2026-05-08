@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
 )
 
 func TestCodeAnalyzer_AnalyzePaths(t *testing.T) {

@@ -1,6 +1,6 @@
 package golang
 
-import "github.com/doITmagic/rag-code-mcp/internal/codetypes"
+import "github.com/homiodev/rag-code-mcp/internal/codetypes"
 
 // PackageInfo contains comprehensive information about a Go package
 type PackageInfo struct {

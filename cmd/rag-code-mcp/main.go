@@ -15,13 +15,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/doITmagic/rag-code-mcp/internal/config"
-	"github.com/doITmagic/rag-code-mcp/internal/healthcheck"
-	"github.com/doITmagic/rag-code-mcp/internal/llm"
-	"github.com/doITmagic/rag-code-mcp/internal/storage"
-	"github.com/doITmagic/rag-code-mcp/internal/tools"
-	"github.com/doITmagic/rag-code-mcp/internal/updater"
-	"github.com/doITmagic/rag-code-mcp/internal/workspace"
+	"github.com/homiodev/rag-code-mcp/internal/config"
+	"github.com/homiodev/rag-code-mcp/internal/healthcheck"
+	"github.com/homiodev/rag-code-mcp/internal/llm"
+	"github.com/homiodev/rag-code-mcp/internal/storage"
+	"github.com/homiodev/rag-code-mcp/internal/tools"
+	"github.com/homiodev/rag-code-mcp/internal/updater"
+	"github.com/homiodev/rag-code-mcp/internal/workspace"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
@@ -1178,7 +1178,7 @@ ENVIRONMENT VARIABLES:
     Logging:
     MCP_LOG_LEVEL                Log level: debug, info, warn, error (default: info)
 
-For more information, visit: https://github.com/doITmagic/rag-code-mcp
+For more information, visit: https://github.com/homiodev/rag-code-mcp
 `)
 }
 

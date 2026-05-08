@@ -246,7 +246,7 @@ java/
 ### Standard Analysis
 
 ```go
-import "github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/java"
+import "github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/java"
 
 // Create analyzer (excludes test files by default)
 analyzer := java.NewCodeAnalyzer()

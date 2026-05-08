@@ -14,11 +14,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/doITmagic/rag-code-mcp/internal/config"
-	"github.com/doITmagic/rag-code-mcp/internal/llm"
-	"github.com/doITmagic/rag-code-mcp/internal/memory"
-	"github.com/doITmagic/rag-code-mcp/internal/ragcode"
-	"github.com/doITmagic/rag-code-mcp/internal/storage"
+	"github.com/homiodev/rag-code-mcp/internal/config"
+	"github.com/homiodev/rag-code-mcp/internal/llm"
+	"github.com/homiodev/rag-code-mcp/internal/memory"
+	"github.com/homiodev/rag-code-mcp/internal/ragcode"
+	"github.com/homiodev/rag-code-mcp/internal/storage"
 )
 
 // Manager manages workspace detection, collection management, and indexing

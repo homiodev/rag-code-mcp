@@ -169,7 +169,7 @@ golang/
 ### Analiză Package
 
 ```go
-import "github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/golang"
+import "github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/golang"
 
 // Creare analizor
 analyzer := golang.NewCodeAnalyzer()

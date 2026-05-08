@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/doITmagic/rag-code-mcp/internal/config"
+	"github.com/homiodev/rag-code-mcp/internal/config"
 )
 
 func TestGenerateOptionsHelpers(t *testing.T) {

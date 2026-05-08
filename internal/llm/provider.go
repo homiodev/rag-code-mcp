@@ -6,8 +6,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/doITmagic/rag-code-mcp/internal/config"
-	"github.com/doITmagic/rag-code-mcp/internal/utils"
+	"github.com/homiodev/rag-code-mcp/internal/config"
+	"github.com/homiodev/rag-code-mcp/internal/utils"
 )
 
 // Provider represents an LLM provider interface

@@ -117,7 +117,7 @@ changelog:
 
 release:
   github:
-    owner: doITmagic
+    owner: homiodev
     name: rag-code-mcp
   
   draft: false
@@ -134,13 +134,13 @@ release:
     
     **Linux (amd64):**
     ```bash
-    curl -L https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz
+    curl -L https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz
     ./ragcode-installer -ollama=docker -qdrant=docker
     ```
     
     **macOS (Apple Silicon):**
     ```bash
-    curl -L https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_arm64.tar.gz | tar xz
+    curl -L https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_arm64.tar.gz | tar xz
     ./ragcode-installer -ollama=docker -qdrant=docker
     ```
     
@@ -153,13 +153,13 @@ release:
     2. Configure your environment (see README.md)
     3. Start the server: `rag-code-mcp`
     
-    **Full documentation:** https://github.com/doITmagic/rag-code-mcp
+    **Full documentation:** https://github.com/homiodev/rag-code-mcp
 
 # Homebrew tap (optional, can be enabled later)
 # brews:
 #   - repository:
-#       owner: doITmagic
+#       owner: homiodev
 #       name: homebrew-tap
-#     homepage: https://github.com/doITmagic/rag-code-mcp
+#     homepage: https://github.com/homiodev/rag-code-mcp
 #     description: Semantic code navigation for Go codebases using RAG
 #     license: MIT

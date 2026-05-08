@@ -15,7 +15,7 @@ import (
 	"github.com/VKCOM/php-parser/pkg/visitor"
 	"github.com/VKCOM/php-parser/pkg/visitor/traverser"
 
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
 )
 
 // CodeAnalyzer implements PathAnalyzer for PHP

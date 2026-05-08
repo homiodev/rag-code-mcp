@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/doITmagic/rag-code-mcp/internal/config"
+	"github.com/homiodev/rag-code-mcp/internal/config"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/ollama"
 )

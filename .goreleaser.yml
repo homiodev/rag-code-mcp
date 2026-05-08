@@ -103,7 +103,7 @@ changelog:
 
 release:
   github:
-    owner: doITmagic
+    owner: homiodev
     name: rag-code-mcp
   draft: false
   prerelease: auto

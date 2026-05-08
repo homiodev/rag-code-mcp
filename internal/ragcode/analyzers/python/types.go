@@ -1,6 +1,6 @@
 package python
 
-import "github.com/doITmagic/rag-code-mcp/internal/codetypes"
+import "github.com/homiodev/rag-code-mcp/internal/codetypes"
 
 // ModuleInfo contains comprehensive information about a Python module/package
 type ModuleInfo struct {

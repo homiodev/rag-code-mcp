@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
 )
 
 // CodeAnalyzer implements PathAnalyzer for Java code
@@ -537,11 +537,11 @@ func (a *CodeAnalyzer) classToChunks(class ClassInfo, packageName string) []code
 		Code:        class.Code,
 		Metadata: map[string]interface{}{
 			"access_modifier": class.AccessModifier,
-			"is_abstract":      class.IsAbstract,
-			"is_final":         class.IsFinal,
-			"is_static":        class.IsStatic,
-			"superclass":       class.Superclass,
-			"interfaces":       class.Interfaces,
+			"is_abstract":     class.IsAbstract,
+			"is_final":        class.IsFinal,
+			"is_static":       class.IsStatic,
+			"superclass":      class.Superclass,
+			"interfaces":      class.Interfaces,
 		},
 	}
 	chunks = append(chunks, chunk)
@@ -557,13 +557,13 @@ func (a *CodeAnalyzer) classToChunks(class ClassInfo, packageName string) []code
 			StartLine:   method.StartLine,
 			Code:        method.Signature,
 			Metadata: map[string]interface{}{
-				"class_name":       class.Name,
-				"access_modifier":  method.AccessModifier,
-				"is_abstract":      method.IsAbstract,
-				"is_static":        method.IsStatic,
-				"is_final":         method.IsFinal,
-				"is_synchronized":  method.IsSynchronized,
-				"return_type":      method.ReturnType,
+				"class_name":      class.Name,
+				"access_modifier": method.AccessModifier,
+				"is_abstract":     method.IsAbstract,
+				"is_static":       method.IsStatic,
+				"is_final":        method.IsFinal,
+				"is_synchronized": method.IsSynchronized,
+				"return_type":     method.ReturnType,
 			},
 		}
 		chunks = append(chunks, methodChunk)
@@ -579,11 +579,11 @@ func (a *CodeAnalyzer) classToChunks(class ClassInfo, packageName string) []code
 			FilePath:    field.FilePath,
 			StartLine:   field.StartLine,
 			Metadata: map[string]interface{}{
-				"class_name":       class.Name,
-				"access_modifier":  field.AccessModifier,
-				"is_static":        field.IsStatic,
-				"is_final":         field.IsFinal,
-				"type":             field.Type,
+				"class_name":      class.Name,
+				"access_modifier": field.AccessModifier,
+				"is_static":       field.IsStatic,
+				"is_final":        field.IsFinal,
+				"type":            field.Type,
 			},
 		}
 		chunks = append(chunks, fieldChunk)

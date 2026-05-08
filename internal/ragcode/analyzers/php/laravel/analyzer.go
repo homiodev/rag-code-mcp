@@ -1,7 +1,7 @@
 package laravel
 
 import (
-	"github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/php"
+	"github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/php"
 )
 
 // Analyzer is the main Laravel framework analyzer that coordinates all Laravel-specific analyzers

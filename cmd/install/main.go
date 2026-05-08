@@ -549,7 +549,7 @@ func installBinary() {
 	// Option 3: Fallback to local build if source is present
 	warn("Download failed – attempting local build from source.")
 	if _, err := os.Stat("./cmd/rag-code-mcp"); err != nil {
-		fail("Binary not found. Please download the release archive from:\nhttps://github.com/doITmagic/rag-code-mcp/releases/latest")
+		fail("Binary not found. Please download the release archive from:\nhttps://github.com/homiodev/rag-code-mcp/releases/latest")
 	}
 	cmd := exec.Command("go", "build", "-o", outputBin, "./cmd/rag-code-mcp")
 	cmd.Stdout = os.Stdout
@@ -608,7 +608,7 @@ func downloadAndExtractBinary(dest string) bool {
 	default:
 		return false
 	}
-	url := fmt.Sprintf("https://github.com/doITmagic/rag-code-mcp/releases/latest/download/%s", archiveName)
+	url := fmt.Sprintf("https://github.com/homiodev/rag-code-mcp/releases/latest/download/%s", archiveName)
 	log(fmt.Sprintf("Downloading from %s...", url))
 
 	resp, err := http.Get(url)

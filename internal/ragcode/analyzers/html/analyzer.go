@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
 )
 
 // CodeAnalyzer implements codetypes.PathAnalyzer for HTML documents.

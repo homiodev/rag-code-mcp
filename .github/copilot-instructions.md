@@ -30,4 +30,4 @@ RagCode is a Model Context Protocol (MCP) server that provides semantic code sea
 - **Qdrant**: Runs in Docker as `ragcode-qdrant` on port 6333.
 
 ## Romania/Hungarian Support (Note)
-The project identifies as `rag-code-mcp`. Old configurations naming it `do-ai` or `coderag` are deprecated and paths must be updated to the new project structure in `github.com/doITmagic/rag-code-mcp`.
+The project identifies as `rag-code-mcp`. Old configurations naming it `do-ai` or `coderag` are deprecated and paths must be updated to the new project structure in `github.com/homiodev/rag-code-mcp`.

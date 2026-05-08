@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/VKCOM/php-parser/pkg/token"
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
 )
 
 // PHPDocInfo contains parsed PHPDoc information

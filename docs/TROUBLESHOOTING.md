@@ -287,7 +287,7 @@ curl http://localhost:6333/collections
 If your issue isn't listed here:
 
 1. **Check logs:** `tail -f ~/.local/share/ragcode/bin/mcp.log`
-2. **Search issues:** [GitHub Issues](https://github.com/doITmagic/rag-code-mcp/issues)
+2. **Search issues:** [GitHub Issues](https://github.com/homiodev/rag-code-mcp/issues)
 3. **Open new issue:** Include logs, OS, and steps to reproduce
 
 ---

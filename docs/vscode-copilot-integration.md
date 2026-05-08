@@ -47,7 +47,7 @@ Before setting up RagCode with VS Code + Copilot, ensure you have:
 
 ```bash
 # Linux (amd64) - ONE COMMAND
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 This creates the MCP configuration file at:
@@ -519,7 +519,7 @@ When searching for code:
 
 ## Resources
 
-- **RagCode GitHub:** https://github.com/doITmagic/rag-code-mcp
+- **RagCode GitHub:** https://github.com/homiodev/rag-code-mcp
 - **VS Code MCP Docs:** https://code.visualstudio.com/docs/copilot/copilot-extensibility-overview
 - **GitHub Copilot Docs:** https://docs.github.com/copilot
 - **Model Context Protocol:** https://modelcontextprotocol.io
@@ -534,7 +534,7 @@ If you encounter issues:
 
 1. **Check the troubleshooting section** above
 2. **Review MCP logs** (enable debug logging)
-3. **Open an issue:** https://github.com/doITmagic/rag-code-mcp/issues
+3. **Open an issue:** https://github.com/homiodev/rag-code-mcp/issues
 4. **Include:**
    - VS Code version
    - RagCode version

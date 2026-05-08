@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/VKCOM/php-parser/pkg/ast"
-	"github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/php"
+	"github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/php"
 )
 
 // EloquentAnalyzer extracts Eloquent model information from PHP package info

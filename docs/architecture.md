@@ -448,7 +448,7 @@ Create `analyzer.go`:
 ```go
 package <language>
 
-import "github.com/doITmagic/rag-code-mcp/internal/codetypes"
+import "github.com/homiodev/rag-code-mcp/internal/codetypes"
 
 type CodeAnalyzer struct {
     // language-specific fields
@@ -472,7 +472,7 @@ Create `api_analyzer.go`:
 ```go
 package <language>
 
-import "github.com/doITmagic/rag-code-mcp/internal/codetypes"
+import "github.com/homiodev/rag-code-mcp/internal/codetypes"
 
 type APIAnalyzerImpl struct {
     analyzer *CodeAnalyzer
@@ -494,7 +494,7 @@ func (a *APIAnalyzerImpl) AnalyzeAPIPaths(paths []string) ([]codetypes.APIChunk,
 Update `internal/ragcode/language_manager.go`:
 
 ```go
-import "github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/<language>"
+import "github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/<language>"
 
 const (
     Language<Name> Language = "<language>"

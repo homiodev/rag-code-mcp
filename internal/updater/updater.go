@@ -13,12 +13,10 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-
-	"github.com/Masterminds/semver/v3"
 )
 
 const (
-	GitHubOwner = "doITmagic"
+	GitHubOwner = "homiodev"
 	GitHubRepo  = "rag-code-mcp"
 )
 

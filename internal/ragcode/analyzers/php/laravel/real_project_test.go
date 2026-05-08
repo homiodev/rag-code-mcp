@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/php"
+	"github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/php"
 	"github.com/stretchr/testify/assert"
 )
 
 // TestRealBarouProject_FullAnalysis tests the complete analysis of the Barou Laravel project
 func TestRealBarouProject_FullAnalysis(t *testing.T) {
-	barouPath := "/home/razvan/go/src/github.com/doITmagic/rag-code-mcp/barou"
+	barouPath := "/home/razvan/go/src/github.com/homiodev/rag-code-mcp/barou"
 
 	// Check if barou project exists
 	if _, err := os.Stat(barouPath); os.IsNotExist(err) {

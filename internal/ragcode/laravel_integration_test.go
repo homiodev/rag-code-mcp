@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/doITmagic/rag-code-mcp/internal/llm"
-	"github.com/doITmagic/rag-code-mcp/internal/memory"
-	"github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/php/laravel"
+	"github.com/homiodev/rag-code-mcp/internal/llm"
+	"github.com/homiodev/rag-code-mcp/internal/memory"
+	"github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/php/laravel"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -127,7 +127,7 @@ func (m *mockMemoryStore) DeleteByMetadata(ctx context.Context, key, value strin
 
 // TestAnalyzerManager_WithBarouProject tests analyzer selection with real Barou project
 func TestAnalyzerManager_WithBarouProject(t *testing.T) {
-	barouPath := "/home/razvan/go/src/github.com/doITmagic/rag-code-mcp/barou"
+	barouPath := "/home/razvan/go/src/github.com/homiodev/rag-code-mcp/barou"
 
 	if _, err := os.Stat(barouPath); os.IsNotExist(err) {
 		t.Skip("Barou project not found")

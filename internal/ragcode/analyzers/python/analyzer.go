@@ -9,7 +9,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
 )
 
 // Pre-compiled regex patterns for better performance

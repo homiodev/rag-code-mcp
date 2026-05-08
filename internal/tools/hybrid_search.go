@@ -8,9 +8,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/doITmagic/rag-code-mcp/internal/llm"
-	"github.com/doITmagic/rag-code-mcp/internal/memory"
-	"github.com/doITmagic/rag-code-mcp/internal/workspace"
+	"github.com/homiodev/rag-code-mcp/internal/llm"
+	"github.com/homiodev/rag-code-mcp/internal/memory"
+	"github.com/homiodev/rag-code-mcp/internal/workspace"
 )
 
 // HybridSearchTool combines basic lexical matching with semantic scoring from vector search

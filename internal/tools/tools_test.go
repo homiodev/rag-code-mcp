@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
-	"github.com/doITmagic/rag-code-mcp/internal/llm"
-	"github.com/doITmagic/rag-code-mcp/internal/memory"
-	"github.com/doITmagic/rag-code-mcp/internal/workspace"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/llm"
+	"github.com/homiodev/rag-code-mcp/internal/memory"
+	"github.com/homiodev/rag-code-mcp/internal/workspace"
 )
 
 // mockProvider is a simple mock for llm.Provider used in tests.
@@ -423,7 +423,7 @@ func TestFindTypeDefinitionTool_PHPUser(t *testing.T) {
 	ctx := context.Background()
 	ltm := memory.NewInMemoryLongTermMemory()
 
-	userPath := "/home/razvan/go/src/github.com/doITmagic/rag-code-mcp/barou/app/User.php"
+	userPath := "/home/razvan/go/src/github.com/homiodev/rag-code-mcp/barou/app/User.php"
 	if _, err := os.Stat(userPath); os.IsNotExist(err) {
 		t.Skipf("User.php not found at %s, skipping", userPath)
 	}
@@ -456,7 +456,7 @@ func TestGetFunctionDetailsTool_PHPUserRoles(t *testing.T) {
 	ctx := context.Background()
 	ltm := memory.NewInMemoryLongTermMemory()
 
-	userPath := "/home/razvan/go/src/github.com/doITmagic/rag-code-mcp/barou/app/User.php"
+	userPath := "/home/razvan/go/src/github.com/homiodev/rag-code-mcp/barou/app/User.php"
 	if _, err := os.Stat(userPath); os.IsNotExist(err) {
 		t.Skipf("User.php not found at %s, skipping", userPath)
 	}
@@ -489,7 +489,7 @@ func TestFindTypeDefinitionTool_PHPUser_JSON(t *testing.T) {
 	ctx := context.Background()
 	ltm := memory.NewInMemoryLongTermMemory()
 
-	userPath := "/home/razvan/go/src/github.com/doITmagic/rag-code-mcp/barou/app/User.php"
+	userPath := "/home/razvan/go/src/github.com/homiodev/rag-code-mcp/barou/app/User.php"
 	if _, err := os.Stat(userPath); os.IsNotExist(err) {
 		t.Skipf("User.php not found at %s, skipping", userPath)
 	}
@@ -543,7 +543,7 @@ func TestGetFunctionDetailsTool_PHPUserRoles_JSON(t *testing.T) {
 	ctx := context.Background()
 	ltm := memory.NewInMemoryLongTermMemory()
 
-	userPath := "/home/razvan/go/src/github.com/doITmagic/rag-code-mcp/barou/app/User.php"
+	userPath := "/home/razvan/go/src/github.com/homiodev/rag-code-mcp/barou/app/User.php"
 	if _, err := os.Stat(userPath); os.IsNotExist(err) {
 		t.Skipf("User.php not found at %s, skipping", userPath)
 	}
@@ -596,7 +596,7 @@ func TestGetFunctionDetailsTool_PHPUserRoles_JSON(t *testing.T) {
 
 func TestListPackageExports_PHPApp(t *testing.T) {
 	ctx := context.Background()
-	root := "/home/razvan/go/src/github.com/doITmagic/rag-code-mcp/barou"
+	root := "/home/razvan/go/src/github.com/homiodev/rag-code-mcp/barou"
 	if _, err := os.Stat(root); os.IsNotExist(err) {
 		t.Skipf("barou workspace not found at %s, skipping", root)
 	}
@@ -613,7 +613,7 @@ func TestListPackageExports_PHPApp(t *testing.T) {
 
 func TestListPackageExports_PHPApp_JSON(t *testing.T) {
 	ctx := context.Background()
-	root := "/home/razvan/go/src/github.com/doITmagic/rag-code-mcp/barou"
+	root := "/home/razvan/go/src/github.com/homiodev/rag-code-mcp/barou"
 	if _, err := os.Stat(root); os.IsNotExist(err) {
 		t.Skipf("barou workspace not found at %s, skipping", root)
 	}

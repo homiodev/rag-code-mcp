@@ -4,12 +4,12 @@
   <p align="center">
     <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
     <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.25%2B-blue" alt="Go Version"></a>
-    <a href="https://goreportcard.com/report/github.com/doITmagic/rag-code-mcp"><img src="https://goreportcard.com/badge/github.com/doITmagic/rag-code-mcp" alt="Go Report Card"></a>
+    <a href="https://goreportcard.com/report/github.com/homiodev/rag-code-mcp"><img src="https://goreportcard.com/badge/github.com/homiodev/rag-code-mcp" alt="Go Report Card"></a>
     <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/Status-AI%20Ready-blueviolet" alt="AI Ready"></a>
     <img src="https://img.shields.io/badge/Privacy-100%25%20Local-brightgreen" alt="Privacy">
     <img src="https://img.shields.io/badge/Cloud-Not%20Required-orange" alt="No Cloud">
     <img src="https://img.shields.io/badge/API%20Costs-$0-success" alt="Zero Cost">
-    <a href="https://github.com/doITmagic/rag-code-mcp"><img src="https://img.shields.io/github/stars/doITmagic/rag-code-mcp?style=social" alt="GitHub Stars"></a>
+    <a href="https://github.com/homiodev/rag-code-mcp"><img src="https://img.shields.io/github/stars/homiodev/rag-code-mcp?style=social" alt="GitHub Stars"></a>
   </p>
 </div>
 
@@ -29,21 +29,21 @@ Built with the official [Model Context Protocol Go SDK](https://github.com/model
 
 ### Linux (amd64)
 ```bash
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 ### macOS (Apple Silicon / Intel)
 ```bash
 # Apple Silicon (M1/M2/M3)
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_arm64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_arm64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 
 # Intel Macs
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 ### Windows (PowerShell)
 ```powershell
-Invoke-WebRequest -Uri "https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_windows_amd64.zip" -OutFile "ragcode.zip"; Expand-Archive ragcode.zip -DestinationPath . -Force; .\ragcode-installer.exe -ollama=docker -qdrant=docker
+Invoke-WebRequest -Uri "https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_windows_amd64.zip" -OutFile "ragcode.zip"; Expand-Archive ragcode.zip -DestinationPath . -Force; .\ragcode-installer.exe -ollama=docker -qdrant=docker
 ```
 
 **That's it!** The installer automatically:
@@ -269,14 +269,14 @@ RagCode works with all major AI-powered IDEs:
 
 We welcome contributions! Here's how you can help:
 
-- 🐛 **[Report Bugs](https://github.com/doITmagic/rag-code-mcp/issues/new)**
+- 🐛 **[Report Bugs](https://github.com/homiodev/rag-code-mcp/issues/new)**
 - 💡 **Request Features** - Share ideas for new tools or languages
 - 🔧 **Submit PRs** - Improve code, docs, or add features
-- ⭐ **[Star the Project](https://github.com/doITmagic/rag-code-mcp)** - Show your support
+- ⭐ **[Star the Project](https://github.com/homiodev/rag-code-mcp)** - Show your support
 
 ### Development Setup
 ```bash
-git clone https://github.com/doITmagic/rag-code-mcp.git
+git clone https://github.com/homiodev/rag-code-mcp.git
 cd rag-code-mcp
 go mod download
 go run ./cmd/rag-code-mcp
@@ -300,8 +300,8 @@ RagCode MCP is open source software licensed under the **[MIT License](./LICENSE
 
 **Built with ❤️ for developers who want smarter AI code assistants**
 
-⭐ **[Star us on GitHub](https://github.com/doITmagic/rag-code-mcp)** if RagCode helps your workflow!
+⭐ **[Star us on GitHub](https://github.com/homiodev/rag-code-mcp)** if RagCode helps your workflow!
 
-**Questions?** [Open an Issue](https://github.com/doITmagic/rag-code-mcp/issues) • [Read the Docs](./QUICKSTART.md) • [Join Discussions](https://github.com/doITmagic/rag-code-mcp/discussions)
+**Questions?** [Open an Issue](https://github.com/homiodev/rag-code-mcp/issues) • [Read the Docs](./QUICKSTART.md) • [Join Discussions](https://github.com/homiodev/rag-code-mcp/discussions)
 
 </div>

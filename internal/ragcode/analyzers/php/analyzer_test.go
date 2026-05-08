@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
 	"github.com/stretchr/testify/require"
 )
 
@@ -438,7 +438,7 @@ class Product {
 func TestCodeAnalyzer_BarouUserClass(t *testing.T) {
 	// This test inspects the real Laravel User model from the barou project, if present.
 	// It is intended for manual inspection of the extracted CodeChunk, not for strict assertions.
-	userPath := "/home/razvan/go/src/github.com/doITmagic/rag-code-mcp/barou/app/User.php"
+	userPath := "/home/razvan/go/src/github.com/homiodev/rag-code-mcp/barou/app/User.php"
 	if _, err := os.Stat(userPath); os.IsNotExist(err) {
 		t.Skipf("barou User.php not found at %s, skipping", userPath)
 	}

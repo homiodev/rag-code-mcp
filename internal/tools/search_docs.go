@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/doITmagic/rag-code-mcp/internal/llm"
-	"github.com/doITmagic/rag-code-mcp/internal/memory"
-	"github.com/doITmagic/rag-code-mcp/internal/workspace"
+	"github.com/homiodev/rag-code-mcp/internal/llm"
+	"github.com/homiodev/rag-code-mcp/internal/memory"
+	"github.com/homiodev/rag-code-mcp/internal/workspace"
 )
 
 // SearchDocsTool searches the docs (Markdown) vector index

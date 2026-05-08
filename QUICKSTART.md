@@ -10,22 +10,22 @@ RagCode is an MCP server that enables AI assistants (Copilot, Cursor, Windsurf, 
 
 ### Linux
 ```bash
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 ### macOS (Apple Silicon)
 ```bash
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_arm64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_arm64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 ### macOS (Intel)
 ```bash
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 ### Windows (PowerShell)
 ```powershell
-Invoke-WebRequest -Uri "https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_windows_amd64.zip" -OutFile "ragcode.zip"
+Invoke-WebRequest -Uri "https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_windows_amd64.zip" -OutFile "ragcode.zip"
 Expand-Archive ragcode.zip -DestinationPath . -Force
 .\ragcode-installer.exe -ollama=docker -qdrant=docker
 ```
@@ -36,7 +36,7 @@ If you run Docker via WSL and have IDEs on Windows:
 
 ```bash
 # Inside WSL terminal
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 Then configure your Windows IDE manually (e.g., Windsurf at `%USERPROFILE%\.codeium\windsurf\mcp_config.json`):
@@ -119,8 +119,8 @@ That's it! The AI will use RagCode's semantic search to find relevant code.
 | "Ollama model not found" | Run `ollama pull phi3:medium && ollama pull mxbai-embed-large` |
 | IDE doesn't see RagCode | Re-run `./ragcode-installer -skip-build` |
 
-For more help, see [README.md#troubleshooting](./README.md#-troubleshooting) or open an [Issue](https://github.com/doITmagic/rag-code-mcp/issues).
+For more help, see [README.md#troubleshooting](./README.md#-troubleshooting) or open an [Issue](https://github.com/homiodev/rag-code-mcp/issues).
 
 ---
 
-**Questions?** Open an Issue on [GitHub](https://github.com/doITmagic/rag-code-mcp/issues) 🚀
+**Questions?** Open an Issue on [GitHub](https://github.com/homiodev/rag-code-mcp/issues) 🚀

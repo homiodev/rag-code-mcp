@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/php"
+	"github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/php"
 	"github.com/stretchr/testify/assert"
 )
 

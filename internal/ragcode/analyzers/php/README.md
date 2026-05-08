@@ -238,7 +238,7 @@ php/
 ## 💻 Usage
 
 ```go
-import "github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/php/laravel"
+import "github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/php/laravel"
 
 // For Laravel projects (recommended)
 analyzer := laravel.NewAdapter()

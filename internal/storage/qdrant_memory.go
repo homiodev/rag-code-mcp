@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/doITmagic/rag-code-mcp/internal/memory"
+	"github.com/homiodev/rag-code-mcp/internal/memory"
 )
 
 // QdrantLongTermMemory implements memory.LongTermMemory using Qdrant

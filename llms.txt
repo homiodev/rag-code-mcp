@@ -32,22 +32,22 @@ Unlike generic RAG that splits code into arbitrary text chunks, RagCode:
 
 **Linux:**
 ```bash
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_linux_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 **macOS (Apple Silicon):**
 ```bash
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_arm64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_arm64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 **macOS (Intel):**
 ```bash
-curl -fsSL https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
+curl -fsSL https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_darwin_amd64.tar.gz | tar xz && ./ragcode-installer -ollama=docker -qdrant=docker
 ```
 
 **Windows (PowerShell):**
 ```powershell
-Invoke-WebRequest -Uri "https://github.com/doITmagic/rag-code-mcp/releases/latest/download/rag-code-mcp_windows_amd64.zip" -OutFile "ragcode.zip"; Expand-Archive ragcode.zip -DestinationPath . -Force; .\ragcode-installer.exe -ollama=docker -qdrant=docker
+Invoke-WebRequest -Uri "https://github.com/homiodev/rag-code-mcp/releases/latest/download/rag-code-mcp_windows_amd64.zip" -OutFile "ragcode.zip"; Expand-Archive ragcode.zip -DestinationPath . -Force; .\ragcode-installer.exe -ollama=docker -qdrant=docker
 ```
 
 **Windows with WSL:** Install Linux version in WSL, then configure Windows IDEs to use `wsl.exe` as command with args `["-e", "/home/USER/.local/share/ragcode/bin/rag-code-mcp"]`.
@@ -94,8 +94,8 @@ storage:
 
 ## Links
 
-- GitHub: https://github.com/doITmagic/rag-code-mcp
-- Full docs: https://github.com/doITmagic/rag-code-mcp/blob/main/llms-full.txt
+- GitHub: https://github.com/homiodev/rag-code-mcp
+- Full docs: https://github.com/homiodev/rag-code-mcp/blob/main/llms-full.txt
 
 ## Keywords
 

@@ -210,7 +210,7 @@ python/
 ### Standard Analysis
 
 ```go
-import "github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/python"
+import "github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/python"
 
 // Create analyzer (excludes test files by default)
 analyzer := python.NewCodeAnalyzer()

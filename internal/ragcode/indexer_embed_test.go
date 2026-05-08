@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
 )
 
 func TestBuildEmbedText_NoTruncation(t *testing.T) {

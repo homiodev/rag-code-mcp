@@ -3,11 +3,11 @@ package ragcode
 import (
 	"strings"
 
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
-	"github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/golang"
-	htmlanalyzer "github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/html"
-	"github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/php/laravel"
-	"github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/python"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/golang"
+	htmlanalyzer "github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/html"
+	"github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/php/laravel"
+	"github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/python"
 )
 
 // Language identifies a programming language family for code analysis.

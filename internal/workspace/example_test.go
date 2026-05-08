@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/doITmagic/rag-code-mcp/internal/workspace"
+	"github.com/homiodev/rag-code-mcp/internal/workspace"
 )
 
 func ExampleDetector_DetectFromPath() {

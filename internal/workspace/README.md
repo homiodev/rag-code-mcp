@@ -15,7 +15,7 @@ The `workspace` package provides workspace detection and identification for mult
 ### Basic Detection
 
 ```go
-import "github.com/doITmagic/rag-code-mcp/internal/workspace"
+import "github.com/homiodev/rag-code-mcp/internal/workspace"
 
 // Create detector
 detector := workspace.NewDetector()

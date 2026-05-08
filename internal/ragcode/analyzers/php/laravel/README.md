@@ -87,8 +87,8 @@ laravel/
 
 ```go
 import (
-    "github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/php"
-    "github.com/doITmagic/rag-code-mcp/internal/ragcode/analyzers/php/laravel"
+    "github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/php"
+    "github.com/homiodev/rag-code-mcp/internal/ragcode/analyzers/php/laravel"
 )
 
 // First, analyze PHP code

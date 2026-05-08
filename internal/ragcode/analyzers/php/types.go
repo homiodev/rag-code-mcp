@@ -2,7 +2,7 @@ package php
 
 import (
 	"github.com/VKCOM/php-parser/pkg/ast"
-	"github.com/doITmagic/rag-code-mcp/internal/codetypes"
+	"github.com/homiodev/rag-code-mcp/internal/codetypes"
 )
 
 // PackageInfo contains comprehensive information about a PHP namespace/package
