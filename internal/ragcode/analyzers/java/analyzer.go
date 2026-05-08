@@ -417,7 +417,7 @@ func (a *CodeAnalyzer) extractFields(content, filePath string) []FieldInfo {
 			field.Type = strings.TrimSpace(typeMatch[6])
 		}
 
-		fields = append(fields, field)
+		fields = append(fields, *field)
 	}
 
 	return fields
