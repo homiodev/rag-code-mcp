@@ -228,6 +228,7 @@ func (a *CodeAnalyzer) parseRecordBody(content string, match []int, filePath, pk
 		body := content[match[1]:endBrace]
 		rec.Methods = a.extractMethods(body, filePath, name)
 	}
+	expandLombok(rec)
 	return rec
 }
 
@@ -396,6 +397,7 @@ func (a *CodeAnalyzer) parseTypeBody(content string, match []int, filePath, pkg,
 			cls.Constructors = a.extractConstructors(body, filePath, name)
 		}
 	}
+	expandLombok(cls)
 	return cls
 }
 
@@ -809,9 +811,9 @@ func (a *CodeAnalyzer) enumToChunks(enum EnumInfo, pkg string) []codetypes.CodeC
 
 func annotationTypeToChunk(ann AnnotationInfo, pkg string) codetypes.CodeChunk {
 	meta := map[string]any{
-		"retention":  ann.Retention,
-		"target":     ann.Target,
-		"elements":   len(ann.Elements),
+		"retention": ann.Retention,
+		"target":    ann.Target,
+		"elements":  len(ann.Elements),
 	}
 	return codetypes.CodeChunk{
 		Type:      "annotation_type",
@@ -1004,34 +1006,113 @@ func extractAnnotationsBefore(content string, position int) []string {
 	return reAnnotationMarker.FindAllString(before, -1)
 }
 
+// skipLiteral advances past a string literal, char literal, text block, or comment
+// starting at position i. Returns the new position after the construct.
+func skipLiteral(content string, i int) int {
+	if i >= len(content) {
+		return i
+	}
+	c := content[i]
+	switch {
+	case c == '/' && i+1 < len(content) && content[i+1] == '/':
+		// Line comment — skip to end of line.
+		for i < len(content) && content[i] != '\n' {
+			i++
+		}
+	case c == '/' && i+1 < len(content) && content[i+1] == '*':
+		// Block comment — skip to */.
+		i += 2
+		for i+1 < len(content) {
+			if content[i] == '*' && content[i+1] == '/' {
+				return i + 2
+			}
+			i++
+		}
+		return len(content)
+	case c == '"' && i+2 < len(content) && content[i+1] == '"' && content[i+2] == '"':
+		// Text block (Java 15+) — skip to closing """.
+		i += 3
+		for i+2 < len(content) {
+			if content[i] == '"' && content[i+1] == '"' && content[i+2] == '"' {
+				return i + 3
+			}
+			i++
+		}
+		return len(content)
+	case c == '"':
+		// String literal.
+		i++
+		for i < len(content) {
+			if content[i] == '\\' {
+				i += 2
+				continue
+			}
+			if content[i] == '"' {
+				return i + 1
+			}
+			i++
+		}
+		return len(content)
+	case c == '\'':
+		// Char literal.
+		i++
+		for i < len(content) {
+			if content[i] == '\\' {
+				i += 2
+				continue
+			}
+			if content[i] == '\'' {
+				return i + 1
+			}
+			i++
+		}
+		return len(content)
+	default:
+		return i + 1
+	}
+	return i
+}
+
 func findMatchingBrace(content string, openPos int) int {
 	count := 1
-	for i := openPos + 1; i < len(content); i++ {
-		switch content[i] {
-		case '{':
+	i := openPos + 1
+	for i < len(content) {
+		c := content[i]
+		if c == '/' || c == '"' || c == '\'' {
+			i = skipLiteral(content, i)
+			continue
+		}
+		if c == '{' {
 			count++
-		case '}':
+		} else if c == '}' {
 			count--
 			if count == 0 {
 				return i
 			}
 		}
+		i++
 	}
 	return -1
 }
 
 func findMatchingParen(content string, openPos int) int {
 	count := 1
-	for i := openPos + 1; i < len(content); i++ {
-		switch content[i] {
-		case '(':
+	i := openPos + 1
+	for i < len(content) {
+		c := content[i]
+		if c == '/' || c == '"' || c == '\'' {
+			i = skipLiteral(content, i)
+			continue
+		}
+		if c == '(' {
 			count++
-		case ')':
+		} else if c == ')' {
 			count--
 			if count == 0 {
 				return i
 			}
 		}
+		i++
 	}
 	return -1
 }
@@ -1119,10 +1200,221 @@ func isIdentStart(r rune) bool {
 	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || r == '_' || r == '$'
 }
 
+// ─── Lombok annotation expansion ─────────────────────────────────────────────
+
+// hasLombokAnnotation reports whether annotations contains the given Lombok
+// annotation by short name (e.g. "Data") or qualified form (e.g. "lombok.Data").
+func hasLombokAnnotation(annotations []string, name string) bool {
+	for _, ann := range annotations {
+		bare := ann
+		if i := strings.Index(bare, "("); i >= 0 {
+			bare = bare[:i]
+		}
+		bare = strings.TrimPrefix(bare, "@")
+		if bare == name || bare == "lombok."+name || strings.HasSuffix(bare, "."+name) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasMethod(methods []MethodInfo, name string) bool {
+	for _, m := range methods {
+		if m.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func lombokGetterName(fieldName, fieldType string) string {
+	if (fieldType == "boolean" || fieldType == "Boolean") &&
+		strings.HasPrefix(fieldName, "is") && len(fieldName) > 2 &&
+		fieldName[2] >= 'A' && fieldName[2] <= 'Z' {
+		return fieldName
+	}
+	return "get" + strings.ToUpper(fieldName[:1]) + fieldName[1:]
+}
+
+func lombokSetterName(fieldName string) string {
+	return "set" + strings.ToUpper(fieldName[:1]) + fieldName[1:]
+}
+
+func lombokGeneratedMethod(name, returnType, sig, filePath string, startLine int) MethodInfo {
+	return MethodInfo{
+		Name:           name,
+		Signature:      sig,
+		ReturnType:     returnType,
+		AccessModifier: "public",
+		FilePath:       filePath,
+		StartLine:      startLine,
+		Annotations:    []string{"@lombok.Generated"},
+		Code:           "// Lombok-generated",
+	}
+}
+
+func buildLombokCtor(className string, fields []FieldInfo, filePath string, startLine int) ConstructorInfo {
+	var params []codetypes.ParamInfo
+	for _, f := range fields {
+		params = append(params, codetypes.ParamInfo{Name: f.Name, Type: f.Type})
+	}
+	paramParts := make([]string, len(params))
+	for i, p := range params {
+		paramParts[i] = p.Type + " " + p.Name
+	}
+	return ConstructorInfo{
+		Name:           className,
+		Signature:      fmt.Sprintf("public %s(%s)", className, strings.Join(paramParts, ", ")),
+		AccessModifier: "public",
+		Parameters:     params,
+		FilePath:       filePath,
+		StartLine:      startLine,
+		Annotations:    []string{"@lombok.Generated"},
+		Code:           "// Lombok-generated",
+	}
+}
+
+// expandLombok appends virtual methods and constructors to cls based on Lombok
+// annotations present on the class or its fields. Only generates entries that
+// don't already exist in the parsed source.
+func expandLombok(cls *ClassInfo) {
+	anns := cls.Annotations
+	if len(anns) == 0 {
+		// Still check field-level annotations
+		hasAnyFieldLombok := false
+		for _, f := range cls.Fields {
+			if hasLombokAnnotation(f.Annotations, "Getter") || hasLombokAnnotation(f.Annotations, "Setter") {
+				hasAnyFieldLombok = true
+				break
+			}
+		}
+		if !hasAnyFieldLombok {
+			return
+		}
+	}
+
+	hasData := hasLombokAnnotation(anns, "Data")
+	hasValue := hasLombokAnnotation(anns, "Value")
+	hasClassGetter := hasLombokAnnotation(anns, "Getter") || hasData || hasValue
+	hasClassSetter := (hasLombokAnnotation(anns, "Setter") || hasData) && !hasValue
+	hasToString := hasLombokAnnotation(anns, "ToString") || hasData || hasValue
+	hasEqHash := hasLombokAnnotation(anns, "EqualsAndHashCode") || hasData || hasValue
+	hasAllArgs := hasLombokAnnotation(anns, "AllArgsConstructor") || hasValue
+	hasNoArgs := hasLombokAnnotation(anns, "NoArgsConstructor")
+	hasReqArgs := hasLombokAnnotation(anns, "RequiredArgsConstructor") || hasData
+	hasBuilder := hasLombokAnnotation(anns, "Builder") || hasLombokAnnotation(anns, "SuperBuilder")
+
+	fp := cls.FilePath
+	sl := cls.StartLine
+
+	// ── Getters and Setters ──────────────────────────────────────────────────
+	for _, f := range cls.Fields {
+		if f.IsStatic {
+			continue
+		}
+		if hasClassGetter || hasLombokAnnotation(f.Annotations, "Getter") {
+			gName := lombokGetterName(f.Name, f.Type)
+			if !hasMethod(cls.Methods, gName) {
+				cls.Methods = append(cls.Methods, lombokGeneratedMethod(
+					gName, f.Type,
+					fmt.Sprintf("public %s %s()", f.Type, gName),
+					fp, sl))
+			}
+		}
+		if !f.IsFinal && (hasClassSetter || hasLombokAnnotation(f.Annotations, "Setter")) {
+			sName := lombokSetterName(f.Name)
+			if !hasMethod(cls.Methods, sName) {
+				cls.Methods = append(cls.Methods, lombokGeneratedMethod(
+					sName, "void",
+					fmt.Sprintf("public void %s(%s %s)", sName, f.Type, f.Name),
+					fp, sl))
+			}
+		}
+	}
+
+	// ── toString() ───────────────────────────────────────────────────────────
+	if hasToString && !hasMethod(cls.Methods, "toString") {
+		cls.Methods = append(cls.Methods, lombokGeneratedMethod(
+			"toString", "String", "public String toString()", fp, sl))
+	}
+
+	// ── equals() and hashCode() ──────────────────────────────────────────────
+	if hasEqHash {
+		if !hasMethod(cls.Methods, "equals") {
+			cls.Methods = append(cls.Methods, MethodInfo{
+				Name:           "equals",
+				Signature:      "public boolean equals(Object o)",
+				ReturnType:     "boolean",
+				AccessModifier: "public",
+				Parameters:     []codetypes.ParamInfo{{Name: "o", Type: "Object"}},
+				FilePath:       fp,
+				StartLine:      sl,
+				Annotations:    []string{"@lombok.Generated"},
+				Code:           "// Lombok-generated",
+			})
+		}
+		if !hasMethod(cls.Methods, "hashCode") {
+			cls.Methods = append(cls.Methods, lombokGeneratedMethod(
+				"hashCode", "int", "public int hashCode()", fp, sl))
+		}
+	}
+
+	// ── Builder ──────────────────────────────────────────────────────────────
+	if hasBuilder && !hasMethod(cls.Methods, "builder") {
+		builderType := cls.Name + "Builder"
+		cls.Methods = append(cls.Methods, MethodInfo{
+			Name:           "builder",
+			Signature:      fmt.Sprintf("public static %s builder()", builderType),
+			ReturnType:     builderType,
+			AccessModifier: "public",
+			IsStatic:       true,
+			FilePath:       fp,
+			StartLine:      sl,
+			Annotations:    []string{"@lombok.Generated"},
+			Code:           "// Lombok-generated",
+		})
+	}
+
+	// ── Constructors ─────────────────────────────────────────────────────────
+	// Only inject when no constructors were found in source.
+	if len(cls.Constructors) > 0 {
+		return
+	}
+
+	var nonStaticFields, requiredFields []FieldInfo
+	for _, f := range cls.Fields {
+		if f.IsStatic {
+			continue
+		}
+		nonStaticFields = append(nonStaticFields, f)
+		if (f.IsFinal && f.DefaultValue == "") || hasLombokAnnotation(f.Annotations, "NonNull") {
+			requiredFields = append(requiredFields, f)
+		}
+	}
+
+	if hasAllArgs {
+		cls.Constructors = append(cls.Constructors, buildLombokCtor(cls.Name, nonStaticFields, fp, sl))
+	} else if hasNoArgs {
+		cls.Constructors = append(cls.Constructors, buildLombokCtor(cls.Name, nil, fp, sl))
+	} else if hasReqArgs {
+		cls.Constructors = append(cls.Constructors, buildLombokCtor(cls.Name, requiredFields, fp, sl))
+	}
+}
+
 func (a *CodeAnalyzer) shouldSkipFile(path string) bool {
-	if !a.includeTests {
-		base := filepath.Base(path)
-		if strings.HasSuffix(base, "Test.java") || strings.HasSuffix(base, "Tests.java") {
+	if a.includeTests {
+		return false
+	}
+	normalized := filepath.ToSlash(path)
+	if strings.Contains(normalized, "/src/test/") || strings.Contains(normalized, "/test/java/") {
+		return true
+	}
+	base := filepath.Base(path)
+	for _, suffix := range []string{
+		"Test.java", "Tests.java", "IT.java", "ITCase.java",
+		"Spec.java", "TestCase.java", "TestSuite.java",
+	} {
+		if strings.HasSuffix(base, suffix) {
 			return true
 		}
 	}
