@@ -33,6 +33,10 @@ type Manager struct {
 	indexingMu sync.RWMutex
 	indexing   map[string]bool // workspace ID -> is indexing
 
+	// Progress tracking
+	progressMu  sync.RWMutex
+	progressMap map[string]*IndexProgress // indexKey → live state
+
 	// Memory cache
 	memoryMu sync.RWMutex
 	memories map[string]memory.LongTermMemory // collection name -> memory
@@ -48,6 +52,16 @@ type Manager struct {
 	// Mutexes per collection for migration/init operations to prevent race conditions
 	collLocksMu sync.Mutex
 	collLocks   map[string]*sync.Mutex
+}
+
+// IndexProgress holds live embedding progress for one workspace+language pair.
+type IndexProgress struct {
+	Status   string `json:"status"` // idle | indexing | done | error
+	Language string `json:"language,omitempty"`
+	Indexed  int64  `json:"indexed"`
+	Total    int64  `json:"total"`
+	Percent  int    `json:"percent"`
+	Error    string `json:"error,omitempty"`
 }
 
 type workspaceScan struct {
@@ -233,6 +247,7 @@ func NewManager(qdrant *storage.QdrantClient, llm llm.Provider, cfg *config.Conf
 		llm:              llm,
 		config:           cfg,
 		indexing:         make(map[string]bool),
+		progressMap:      make(map[string]*IndexProgress),
 		memories:         make(map[string]memory.LongTermMemory),
 		scanFingerprints: make(map[string]string),
 		watchers:         make(map[string]*FileWatcher),
@@ -256,6 +271,34 @@ func (m *Manager) getCollectionMutex(name string) *sync.Mutex {
 	lock := &sync.Mutex{}
 	m.collLocks[name] = lock
 	return lock
+}
+
+// setProgress updates the progress map for the given indexKey under write lock.
+func (m *Manager) setProgress(indexKey, language string, indexed, total int64) {
+	pct := 0
+	if total > 0 {
+		pct = int(indexed * 100 / total)
+	}
+	m.progressMu.Lock()
+	m.progressMap[indexKey] = &IndexProgress{
+		Status:   "indexing",
+		Language: language,
+		Indexed:  indexed,
+		Total:    total,
+		Percent:  pct,
+	}
+	m.progressMu.Unlock()
+}
+
+// GetAllProgress returns a snapshot of all active progress entries.
+func (m *Manager) GetAllProgress() []IndexProgress {
+	m.progressMu.RLock()
+	defer m.progressMu.RUnlock()
+	out := make([]IndexProgress, 0, len(m.progressMap))
+	for _, p := range m.progressMap {
+		out = append(out, *p)
+	}
+	return out
 }
 
 // DetectWorkspace detects workspace from tool parameters
@@ -499,7 +542,7 @@ func (m *Manager) GetMemoriesForAllLanguages(ctx context.Context, info *Info) (m
 
 // IndexLanguage indexes a specific language in a workspace
 // It runs synchronously. Use StartIndexing for background execution.
-func (m *Manager) IndexLanguage(ctx context.Context, info *Info, language string, collectionName string, force bool) error {
+func (m *Manager) IndexLanguage(ctx context.Context, info *Info, language string, collectionName string, force bool) (retErr error) {
 	// Guard against concurrent indexing for same workspace/language
 	indexKey := info.ID + "-" + language
 	m.indexingMu.Lock()
@@ -514,6 +557,26 @@ func (m *Manager) IndexLanguage(ctx context.Context, info *Info, language string
 		m.indexingMu.Lock()
 		delete(m.indexing, indexKey)
 		m.indexingMu.Unlock()
+
+		// Mark progress as done or error so callers can read final state
+		m.progressMu.Lock()
+		if p, ok := m.progressMap[indexKey]; ok {
+			if retErr != nil {
+				p.Status = "error"
+				p.Error = retErr.Error()
+			} else {
+				p.Status = "done"
+				p.Percent = 100
+			}
+		} else if retErr != nil {
+			// Error occurred before setProgress was ever called (e.g., scan failure)
+			m.progressMap[indexKey] = &IndexProgress{
+				Status:   "error",
+				Language: language,
+				Error:    retErr.Error(),
+			}
+		}
+		m.progressMu.Unlock()
 	}()
 
 	log.Printf("🚀 Starting indexing for workspace: %s", info.Root)
@@ -683,13 +746,18 @@ func (m *Manager) IndexLanguage(ctx context.Context, info *Info, language string
 		indexer := ragcode.NewIndexer(analyzer, m.llm, ltm)
 
 		startTime := time.Now()
-		numChunks, err := indexer.IndexPaths(ctx, filesToIndex, collectionName)
-		duration := time.Since(startTime)
-
-		if err != nil {
-			return fmt.Errorf("indexing failed: %w", err)
+		m.setProgress(indexKey, language, 0, int64(len(filesToIndex)))
+		totalChunks := 0
+		for i, filePath := range filesToIndex {
+			n, ferr := indexer.IndexPaths(ctx, []string{filePath}, collectionName)
+			totalChunks += n
+			m.setProgress(indexKey, language, int64(i+1), int64(len(filesToIndex)))
+			if ferr != nil {
+				log.Printf("[WARN] indexing skipped file %s: %v", filePath, ferr)
+			}
 		}
-		log.Printf("✅ Indexed %d chunks in %v", numChunks, duration)
+		duration := time.Since(startTime)
+		log.Printf("✅ Indexed %d chunks in %v", totalChunks, duration)
 	} else {
 		log.Printf("✨ No code changes detected for language '%s'", language)
 	}

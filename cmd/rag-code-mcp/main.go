@@ -655,6 +655,8 @@ func main() {
 	registerAgentTool(server, searchDocsTool, cfg)
 	registerAgentTool(server, hybridTool, cfg)
 	registerAgentTool(server, indexWorkspaceTool, cfg)
+	statusTool := tools.NewGetIndexStatusTool(workspaceManager)
+	registerAgentTool(server, statusTool, cfg)
 
 	if err := registerFileResources(server); err != nil {
 		log.Fatalf("Failed to register resources: %v", err)
@@ -1095,6 +1097,12 @@ func getToolSchema(toolName string) map[string]interface{} {
 				},
 			},
 			"required": []string{"query"},
+		}
+
+	case "get_index_status":
+		return map[string]interface{}{
+			"type":       "object",
+			"properties": map[string]interface{}{},
 		}
 
 	default:
