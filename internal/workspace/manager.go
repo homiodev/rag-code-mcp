@@ -135,6 +135,9 @@ func (m *Manager) scanWorkspace(info *Info) (*workspaceScan, error) {
 		case ".py":
 			addDirForLanguage(scan, dirCache, "python", filepath.Dir(path))
 			addFileForLanguage(scan, "python", path)
+		case ".java":
+			addDirForLanguage(scan, dirCache, "java", filepath.Dir(path))
+			addFileForLanguage(scan, "java", path)
 		case ".html", ".htm":
 			addDirForLanguage(scan, dirCache, "html", filepath.Dir(path))
 			addFileForLanguage(scan, "html", path)
