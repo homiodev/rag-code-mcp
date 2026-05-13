@@ -15,10 +15,10 @@ import (
 )
 
 // maxEmbedChars is the maximum number of Unicode characters sent to the embedding
-// model. Common models (e.g. nomic-embed-text) have an 8 192-token context window
-// (~4 chars/token → ~32 768 chars). We use 30 000 to give ~6% headroom and stay
-// compatible with smaller-window models.
-const maxEmbedChars = 30_000
+// model. nomic-embed-text v1.5 (used by default) has a 2 048-token context window
+// (~3.5 chars/token → ~7 168 chars). We use 7 000 to stay safely within that limit
+// while remaining compatible with larger-window models.
+const maxEmbedChars = 7_000
 
 // buildEmbedText constructs the text to embed for a CodeChunk, then truncates it
 // to maxChars (rune-safe, UTF-8 correct) to avoid exceeding the model's context
@@ -103,7 +103,8 @@ func (i *Indexer) IndexPaths(ctx context.Context, paths []string, sourceTag stri
 
 		emb, err := i.embedder.Embed(ctx, text)
 		if err != nil {
-			return indexed, fmt.Errorf("embed failed for %s:%s: %w", ch.FilePath, ch.Name, err)
+			log.Printf("[WARN] embed skipped for %s:%s: %v", ch.FilePath, ch.Name, err)
+			continue
 		}
 
 		h := fnv.New64a()
