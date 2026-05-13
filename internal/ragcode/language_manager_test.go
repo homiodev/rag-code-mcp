@@ -88,6 +88,35 @@ func TestAnalyzerManager_CodeAnalyzerForProjectType_Python(t *testing.T) {
 	}
 }
 
+func TestAnalyzerManager_CodeAnalyzerForProjectType_Java(t *testing.T) {
+	mgr := NewAnalyzerManager()
+
+	tests := []struct {
+		name        string
+		projectType string
+		shouldExist bool
+	}{
+		{"java", "java", true},
+		{"Java uppercase", "Java", true},
+		{"maven", "maven", true},
+		{"gradle", "gradle", true},
+		{"spring", "spring", true},
+		{"springboot", "springboot", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			analyzer := mgr.CodeAnalyzerForProjectType(tt.projectType)
+			if tt.shouldExist && analyzer == nil {
+				t.Errorf("Expected non-nil analyzer for project type '%s'", tt.projectType)
+			}
+			if !tt.shouldExist && analyzer != nil {
+				t.Errorf("Expected nil analyzer for project type '%s'", tt.projectType)
+			}
+		})
+	}
+}
+
 func TestAnalyzerManager_CodeAnalyzerForProjectType_Unknown(t *testing.T) {
 	mgr := NewAnalyzerManager()
 
@@ -98,7 +127,6 @@ func TestAnalyzerManager_CodeAnalyzerForProjectType_Unknown(t *testing.T) {
 	}{
 		{"rust (not implemented)", "rust", false},
 		{"javascript (not implemented)", "javascript", false},
-		{"java (not implemented)", "java", false},
 	}
 
 	for _, tt := range tests {
@@ -136,6 +164,12 @@ func TestNormalizeProjectType(t *testing.T) {
 		{"django", LanguagePython},
 		{"flask", LanguagePython},
 		{"fastapi", LanguagePython},
+		{"java", LanguageJava},
+		{"Java", LanguageJava},
+		{"maven", LanguageJava},
+		{"gradle", LanguageJava},
+		{"spring", LanguageJava},
+		{"springboot", LanguageJava},
 		{"rust", Language("rust")},
 	}
 
