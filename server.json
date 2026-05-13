@@ -1,6 +1,6 @@
 {
   "name": "ragcode",
-  "version": "refs/heads/main",
+  "version": "1.0.3",
   "description": "Semantic code navigation using RAG (Retrieval-Augmented Generation) with multi-language support (Go, PHP, Python, JavaScript). Compatible with Windsurf, Cursor, Antigravity, Claude Desktop, and VS Code + GitHub Copilot (agent mode).",
   "homepage": "https://github.com/homiodev/rag-code-mcp",
   "license": "MIT",
