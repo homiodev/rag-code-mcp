@@ -1,0 +1,32 @@
+--- a/internal/workspace/manager.go
++++ b/internal/workspace/manager.go
+@@ -276,14 +276,27 @@ func (m *Manager) getCollectionMutex(name string) *sync.Mutex {
+ // setProgress updates the progress map for the given indexKey under write lock.
+ func (m *Manager) setProgress(indexKey, language string, indexed, total int64) {
+ 	pct := 0
+-	if total > 0 {
+-		pct = int(indexed * 100 / total)
++	
++	m.progressMu.Lock()
++	
++	// If updating existing progress, preserve the original Total
++	// This prevents the total from changing mid-indexing
++	effectiveTotal := total
++	if existing, ok := m.progressMap[indexKey]; ok && existing.Total > 0 {
++		effectiveTotal = existing.Total
+ 	}
+-	m.progressMu.Lock()
++	
++	if effectiveTotal > 0 {
++		pct = int(indexed * 100 / effectiveTotal)
++	}
++	
+ 	m.progressMap[indexKey] = &IndexProgress{
+ 		Status:   "indexing",
+ 		Language: language,
+ 		Indexed:  indexed,
+-		Total:    total,
++		Total:    effectiveTotal,
+ 		Percent:  pct,
+ 	}
+ 	m.progressMu.Unlock()
