@@ -54,14 +54,27 @@ type Manager struct {
 	collLocks   map[string]*sync.Mutex
 }
 
-// IndexProgress holds live embedding progress for one workspace+language pair.
-type IndexProgress struct {
-	Status   string `json:"status"` // idle | indexing | done | error
+// IndexingPhase represents a single phase within an index operation
+type IndexingPhase struct {
+	Name     string `json:"name"`   // "code", "docs", etc.
+	Status   string `json:"status"` // idle|indexing|done|error
 	Language string `json:"language,omitempty"`
 	Indexed  int64  `json:"indexed"`
 	Total    int64  `json:"total"`
 	Percent  int    `json:"percent"`
 	Error    string `json:"error,omitempty"`
+}
+
+// IndexProgress holds live embedding progress for one workspace+language pair with multiple phases
+type IndexProgress struct {
+	IndexKey string          `json:"index_key"`
+	Status   string          `json:"status"` // overall status: idle | indexing | done | error
+	Language string          `json:"language,omitempty"`
+	Phases   []IndexingPhase `json:"phases"`
+	Indexed  int64           `json:"indexed_total"` // aggregated across all phases
+	Total    int64           `json:"total_files"`   // aggregated across all phases
+	Percent  int             `json:"percent"`
+	Error    string          `json:"error,omitempty"`
 }
 
 type workspaceScan struct {
@@ -273,21 +286,83 @@ func (m *Manager) getCollectionMutex(name string) *sync.Mutex {
 	return lock
 }
 
-// setProgress updates the progress map for the given indexKey under write lock.
-func (m *Manager) setProgress(indexKey, language string, indexed, total int64) {
-	pct := 0
-	if total > 0 {
-		pct = int(indexed * 100 / total)
-	}
+// initializePhases sets up the phase tracking for an indexing operation
+func (m *Manager) initializePhases(indexKey, language string, phases map[string]int64) {
 	m.progressMu.Lock()
+	defer m.progressMu.Unlock()
+
+	phasesList := make([]IndexingPhase, 0, len(phases))
+	totalFiles := int64(0)
+
+	for phaseName, count := range phases {
+		phasesList = append(phasesList, IndexingPhase{
+			Name:     phaseName,
+			Status:   "idle",
+			Language: language,
+			Total:    count,
+		})
+		totalFiles += count
+	}
+
 	m.progressMap[indexKey] = &IndexProgress{
+		IndexKey: indexKey,
 		Status:   "indexing",
 		Language: language,
-		Indexed:  indexed,
-		Total:    total,
-		Percent:  pct,
+		Phases:   phasesList,
+		Total:    totalFiles,
 	}
-	m.progressMu.Unlock()
+}
+
+// setPhaseProgress updates progress for a specific phase and recalculates aggregates
+func (m *Manager) setPhaseProgress(indexKey, phaseName string, indexed, total int64, status string) {
+	m.progressMu.Lock()
+	defer m.progressMu.Unlock()
+
+	progress, ok := m.progressMap[indexKey]
+	if !ok {
+		return
+	}
+
+	// Update the phase
+	for i, phase := range progress.Phases {
+		if phase.Name == phaseName {
+			pct := 0
+			if total > 0 {
+				pct = int(indexed * 100 / total)
+			}
+			progress.Phases[i] = IndexingPhase{
+				Name:     phaseName,
+				Status:   status,
+				Language: phase.Language,
+				Indexed:  indexed,
+				Total:    total,
+				Percent:  pct,
+			}
+			break
+		}
+	}
+
+	// Recalculate aggregates
+	totalIndexed := int64(0)
+	allDone := true
+	for _, phase := range progress.Phases {
+		totalIndexed += phase.Indexed
+		if phase.Status != "done" && phase.Status != "idle" {
+			allDone = false
+		}
+	}
+
+	overallPct := 0
+	if progress.Total > 0 {
+		overallPct = int(totalIndexed * 100 / progress.Total)
+	}
+
+	progress.Indexed = totalIndexed
+	progress.Percent = overallPct
+
+	if allDone {
+		progress.Status = "done"
+	}
 }
 
 // GetAllProgress returns a snapshot of all active progress entries.
@@ -564,13 +639,15 @@ func (m *Manager) IndexLanguage(ctx context.Context, info *Info, language string
 			if retErr != nil {
 				p.Status = "error"
 				p.Error = retErr.Error()
-			} else {
-				p.Status = "done"
-				p.Percent = 100
+				for i := range p.Phases {
+					p.Phases[i].Status = "error"
+					p.Phases[i].Error = retErr.Error()
+				}
 			}
 		} else if retErr != nil {
-			// Error occurred before setProgress was ever called (e.g., scan failure)
+			// Error occurred before initializePhases was ever called (e.g., scan failure)
 			m.progressMap[indexKey] = &IndexProgress{
+				IndexKey: indexKey,
 				Status:   "error",
 				Language: language,
 				Error:    retErr.Error(),
@@ -739,6 +816,16 @@ func (m *Manager) IndexLanguage(ctx context.Context, info *Info, language string
 		}
 	}
 
+	// Calculate total files upfront for each phase
+	totalCodeFiles := int64(len(filesToIndex))
+	totalDocFiles := int64(len(docsToIndex))
+
+	// Initialize phases at start of indexing
+	m.initializePhases(indexKey, language, map[string]int64{
+		"code": totalCodeFiles,
+		"docs": totalDocFiles,
+	})
+
 	// Process indexing (Code)
 	if len(filesToIndex) > 0 {
 		log.Printf("📝 Indexing %d new/modified code files...", len(filesToIndex))
@@ -746,27 +833,31 @@ func (m *Manager) IndexLanguage(ctx context.Context, info *Info, language string
 		indexer := ragcode.NewIndexer(analyzer, m.llm, ltm)
 
 		startTime := time.Now()
-		m.setProgress(indexKey, language, 0, int64(len(filesToIndex)))
+		m.setPhaseProgress(indexKey, "code", 0, totalCodeFiles, "indexing")
 		totalChunks := 0
 		for i, filePath := range filesToIndex {
 			n, ferr := indexer.IndexPaths(ctx, []string{filePath}, collectionName)
 			totalChunks += n
-			m.setProgress(indexKey, language, int64(i+1), int64(len(filesToIndex)))
+			m.setPhaseProgress(indexKey, "code", int64(i+1), totalCodeFiles, "indexing")
 			if ferr != nil {
 				log.Printf("[WARN] indexing skipped file %s: %v", filePath, ferr)
 			}
 		}
+		m.setPhaseProgress(indexKey, "code", totalCodeFiles, totalCodeFiles, "done")
 		duration := time.Since(startTime)
 		log.Printf("✅ Indexed %d chunks in %v", totalChunks, duration)
 	} else {
 		log.Printf("✨ No code changes detected for language '%s'", language)
+		m.setPhaseProgress(indexKey, "code", 0, totalCodeFiles, "done")
 	}
 
 	// Process indexing (Docs)
 	if len(docsToIndex) > 0 {
 		log.Printf("📚 Indexing %d new/modified doc files...", len(docsToIndex))
+		m.setPhaseProgress(indexKey, "docs", 0, totalDocFiles, "indexing")
 		// We use indexMarkdownFiles but only for the changed list
 		numDocs := m.indexMarkdownFiles(ctx, docsToIndex, collectionName, ltm)
+		m.setPhaseProgress(indexKey, "docs", totalDocFiles, totalDocFiles, "done")
 		if numDocs > 0 {
 			log.Printf("   Docs chunks indexed: %d", numDocs)
 		}
@@ -774,6 +865,7 @@ func (m *Manager) IndexLanguage(ctx context.Context, info *Info, language string
 		if len(currentDocs) > 0 {
 			log.Printf("✨ No documentation changes detected")
 		}
+		m.setPhaseProgress(indexKey, "docs", 0, totalDocFiles, "done")
 	}
 
 	// Save state
